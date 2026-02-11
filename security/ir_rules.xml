@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Record rule: Portal users can only access their own survey responses -->
+    <record id="survey_user_input_portal_rule" model="ir.rule">
+        <field name="name">Portal users: own survey responses only</field>
+        <field name="model_id" ref="survey.model_survey_user_input"/>
+        <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

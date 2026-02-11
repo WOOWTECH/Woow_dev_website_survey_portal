@@ -1,0 +1,406 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <template id="portal_my_home_survey" inherit_id="portal.portal_my_home"
+        name="Portal My Survey: Survey Details" customize_show="True" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon"
+                    t-value="'/dev_website_survey_portal/static/description/images/folder.svg'"
+                    style="height:64px;width:64px;" />
+                <t t-set="title">Survey</t>
+                <t t-set="url" t-value="'/my/survey_detail'" />
+                <t t-set="placeholder_count" t-value="'survey'" />
+            </t>
+        </xpath>
+    </template>
+    
+    
+    
+    
+    
+
+    <template id="portal_my_home_menu_survey_details" name="Portal Layout : Survey Details Menu"
+        inherit_id="portal.portal_breadcrumbs" priority="20">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'survey_detail_tree'"
+                t-attf-class="breadcrumb-item #{'active' if not survey_detail else ''}">
+                Survey Details
+            </li>
+            
+            <li t-if="page_name == 'survey_detail_page'" class="breadcrumb-item active">
+                <a t-if="survey_detail" t-attf-href="/my/survey_detail?{{ keep_query() }}">Survey Details</a>
+                / Survey-<t t-esc="survey_detail.survey_id.title" />
+            </li>
+            
+        </xpath>
+    </template>
+<!--   TREE VIEW-->
+    <template id="portal_my_survey_detail_1" name="My Survey Details">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Survey Details</t>
+            </t>
+            <t t-if="not survey_detail">
+                <p>There are currently no Survey for your account.</p>
+            </t>
+            <t t-if="survey_detail" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th >Survey</th>
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Customer</th>
+                        <th class="text-center">Attempt n°</th>
+                        <th class="text-center">Score(%)</th>
+                    </tr>
+                </thead>
+                <t t-foreach="survey_detail" t-as="l">
+                    <tr>
+                        <td>
+                             <a t-att-href="l.get_portal_url()">
+                                <t t-esc="l.survey_id.title" />
+                             </a>   
+                        </td>
+                        <td class="text-center">
+                            <span t-field="l.create_date" />
+                        </td>
+                        <td>
+                            <span t-field="l.partner_id" />
+                        </td>
+                        <td class="text-center">
+                            <span t-field="l.attempts_number" />
+                        </td>
+                        <td class="text-center">
+                            <span t-field="l.scoring_percentage" />
+
+                        </td>
+                         <td>
+                            <div class="btn-group flex-grow-1 mr-1 mb-1"  t-if="l.scoring_percentage >= l.survey_id.scoring_success_min">
+                                        <a class="btn btn-secondary btn-block o_download_btn" t-att-href="l.get_portal_url(report_type='pdf', download=True)" title="Download" id="print_admission_report"><i class="fa fa-download"/> Print Certificate</a>
+                           </div> 
+                        </td>
+                    </tr>
+                </t>
+            </t>
+        </t>
+    </template>
+    
+   <template id="main_portal_template_1" name="Survey Portal Template" inherit_id="portal.portal_sidebar" primary="True">
+        <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+            <div class="row mt16 o_portal_sale_sidebar">
+                <!-- Sidebar -->
+                <t t-call="portal.portal_record_sidebar">
+                    <t t-set="classes" t-value="'col-lg-auto d-print-none'"/>
+                    <t t-set="title">
+                        <h5 class="mb-0">
+                            <span t-field="survey_detail.survey_id.title"/>
+                        </h5>
+                    </t>
+                    <t t-set="entries">
+                        <ul class="list-group list-group-flush flex-wrap flex-row flex-lg-column">
+                            <li class="list-group-item flex-grow-1">
+                                <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
+                                    <div class="btn-group flex-grow-1 mb-1">
+                                         <a class="btn btn-secondary btn-block o_print_btn o_portal_invoice_print"
+                                         t-att-href="survey_detail.get_portal_url(report_type='html', download=True)"
+                                         id="print_admission_report" title="Print" target="_blank">
+                                         <i class="fa fa-print"/> Print </a>
+                                    </div>
+                                </div>
+
+                            </li>
+                            <li class="navspy list-group-item pl-0 flex-grow-1" t-ignore="true" role="complementary">
+                                <ul class="nav flex-column bs-sidenav"></ul>
+                            </li>
+                            <li t-if="survey_detail.partner_id" class="list-group-item flex-grow-1">
+                                <div class="small mb-1">
+                                    <strong class="text-muted">Your Contact</strong>
+                                </div>
+                                <div class="row flex-nowrap">
+                                    <div
+                                        class="d-flex justify-content-start align-items-center gap-2">
+                                        <img t-if="survey_detail.partner_id.image_1920"
+                                            class="o_avatar o_portal_contact_img rounded"
+                                            t-att-src="image_data_uri(survey_detail.partner_id.image_1920)"
+                                            alt="Contact" />
+                                        <div class="col pl-0" style="min-width: 150px">
+                                            <span t-field="survey_detail.partner_id"
+                                                t-options='{"widget": "contact", "fields": ["name", "email", "mobile"], "no_marker": True}' />
+                                            <a href="#discussion" class="small"><i
+                                                    class="fa fa-comment"></i> Send message</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            
+                        </ul>
+                    </t>
+                </t>
+
+                <div id="salon_booking_content" class="col-12 col-lg justify-content-end">
+	                <div t-attf-class="card #{'pb-5' if report_type == 'html' else ''}">
+                        	<div t-call="dev_website_survey_portal.portal_my_survey_detail_form"/>
+	                </div>
+                      <div id="survey_detail_communication" class="mt-3">
+                        <h3>Communication history</h3>
+                        <t t-call="portal.message_thread">
+                            <t t-set="object" t-value="survey_detail" />
+                        </t>
+                    </div>
+                </div>
+                <hr/>
+            </div>
+        </xpath>
+    </template>
+   
+    <template id="portal_my_survey_detail_form" name="Portal: Survey Detail">
+        <div id="optional_placeholder"></div>
+        <div class="card-header">
+               <table width="100%" style="font-size: 14px;margin-top: 20px;">
+                    <td style="font-size: 22px;">
+                        <b>Survey Detail </b>&#160;#&#160;
+                        <span t-field="survey_detail.survey_id.title" />
+                        <br/>
+                    </td>
+                    <td style="text-align:right; font-size:22px;">
+                       <div  style="background:#875A7B;border-radius:5px">
+		            <h2 class="my-0 text-center" style="padding:3px;font-weight:bold">
+		                <em style="text-transform: capitalize;color:#FFF" t-esc="survey_detail.state" />
+		            </h2>
+                </div>
+                    </td>
+               </table>
+               
+                <t t-foreach="survey_detail.user_input_line_ids" t-as="line">
+               <div role="dialog" class="modal fade" t-attf-id="modelanswer{{line.id}}">
+                  <style>
+					/* Custom CSS for blue checkbox */
+					#dialog .custom-checkbox input[type="checkbox"] {
+					    width: 18px;
+					    height: 18px;
+					    -webkit-appearance: none;
+					    appearance: none;
+					    background-color: #fff;
+					    border: 1px solid #ccc;
+					    border-radius: 3px;
+					    display: inline-block;
+					    position: relative;
+					}
+
+					#dialog .custom-checkbox input[type="checkbox"]:checked {
+					    background-color: #2698bd;
+					    border: 1px solid #2698bd;
+					}
+
+					#dialog .custom-checkbox input[type="checkbox"]:checked::after {
+					    content: '\2713'; /* Unicode checkmark character */
+					    font-size: 18px;
+					    color: #fff;
+					    position: absolute;
+					    top: -3px;
+					    left: 2px;
+					}
+		                </style>
+                <div id="dialog" class="modal-dialog">
+                    <form id="survey_answer_form" method="POST" t-attf-action="/survey/answer/#{line.id}/edit"  enctype="multipart/form-data" class="modal-content">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <header class="modal-header">
+                            <h4 class="modal-title">Open:Answers</h4>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="margin-left:70%;">&amp;times;</button>
+                        </header>
+                        <main class="modal-body">
+                             <div class="form-group mt-2">
+				                        <label for="question">Question</label>
+				                       &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <b> :</b>&#160;&#160;&#160;&#160;
+				                       <span t-field="line.question_id" />
+				                    </div>
+				                    <div class="form-group mt-2">
+				                        <label for="created_on">Created on</label>
+				                        &#160;&#160; &#160;&#160; <b> :</b>&#160;&#160;&#160;&#160;
+				                       <span t-field="line.create_date" />
+				                    </div>
+				                    <div class="form-group mt-2">
+				                        <label for="answer_type">Answer Type</label>
+				                         &#160;&#160; <b> :</b>&#160;&#160;&#160;&#160;
+				                        <span t-field="line.answer_type" />
+				                    </div>
+				                    <div  id="checkbox" class="custom-checkbox" >
+				                        <label for="skiped">Skiped</label>
+				                       &#160;&#160; &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <b> :</b>&#160;&#160;&#160;&#160;
+				                      <input type="checkbox" t-att-disabled="'disabled'" t-att-checked="line.skipped"/>
+				                    </div>
+				                    <div class="form-group mt-2">
+				                        <label for="text_answer">Text Answer</label>
+				                         &#160;&#160;&#160; <b> :</b>&#160;&#160;&#160;&#160;
+				                       <span t-field="line.value_char_box" />
+				                    </div>
+                        </main>
+                        <footer class="modal-footer">
+                            <button type="button" t-att-id="line.id" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                        </footer>
+                    </form>
+                </div>
+            </div>
+          </t>
+        </div>
+        
+        <div class="card-body">
+             <div class="row">
+                <div class="col-lg-9">
+                    <h4></h4>
+                </div>
+                <div class="col-lg-3" >
+<!--                    <h2 class="my-0 text-center" style="padding:3px;font-weight:bold">-->
+<!--                         <a class="btn btn-secondary btn-block o_print_btn o_portal_invoice_print" t-att-href="survey_detail.get_portal_url(report_type='html', download=True)" id="print_admission_report" title="Print" target="_blank"><i class="fa fa-print"/> Print </a>-->
+<!--                    </h2>-->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-lg-4" style="font-weight: bold;font-size: 17px;">Survey</div>
+                        <div class="col-lg-1 text-align-right">:</div>
+                        <div class="col-lg-5 ">
+                            		<span t-field="survey_detail.survey_id.title" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-lg-3" style="font-weight: bold;font-size: 17px;">Deadline </div>
+                        <div class="col-lg-1 text-align-right">:</div>
+                        <div class="col-lg-5">
+                            <span t-field="survey_detail.deadline" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-lg-4" style="font-weight: bold;font-size: 17px;">Created On</div>
+                        <div class="col-lg-1 text-align-right">:</div>
+                        <div class="col-lg-5 ">
+                            <span t-field="survey_detail.create_date" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-lg-3" style="font-weight: bold;font-size: 17px;">Partner</div>
+                        <div class="col-lg-1 text-align-right">:</div>
+                        <div class="col-lg-7">
+                            <span t-field="survey_detail.partner_id" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-lg-4" style="font-weight: bold;font-size: 17px;">Email</div>
+                        <div class="col-lg-1 ">:</div>
+                        <div class="col-lg-7">
+                            <span t-field="survey_detail.email" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-lg-5"></div>
+                        <div class="col-lg-1 text-align-right"></div>
+                        <div class="col-lg-5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+             
+            
+            <table width="100%" style="table-layout: fixed; margin-top: 20px;" class="table table-condensed table-responsive" >
+                        <style>
+				/* Custom CSS for blue checkbox */
+				.custom-checkbox input[type="checkbox"] {
+				    width: 18px;
+				    height: 18px;
+				    -webkit-appearance: none;
+				    appearance: none;
+				    background-color: #fff;
+				    border: 1px solid #ccc;
+				    border-radius: 3px;
+				    display: inline-block;
+				    position: relative;
+				}
+
+				.custom-checkbox input[type="checkbox"]:checked {
+				    background-color: #2698bd;
+				    border: 1px solid #2698bd;
+				}
+
+				.custom-checkbox input[type="checkbox"]:checked::after {
+				    content: '\2713'; /* Unicode checkmark character */
+				    font-size: 18px;
+				    color: #fff;
+				    position: absolute;
+				    top: -3px;
+				    left: 2px;
+				}
+                        </style>
+            
+                        <tr style="word-wrap: break-word;line-height: 12px;">
+                            <td width="35%" style="border-bottom: 2px solid black;border-top: 1px solid white;">
+                                <b>Question</b>
+                            </td>
+                            <td width="35%" style="border-bottom: 2px solid black;border-top: 1px solid white;">
+                                <b>Section</b>
+                            </td>
+                            <td width="25%" style="border-bottom: 2px solid black;border-top: 1px solid white;">
+                                <b>Answer Type</b>
+                            </td>
+                             <td width="25%" style="border-bottom: 2px solid black;border-top: 1px solid white;">
+                                <b>Skipped</b>
+                            </td>
+                            <td width="35%" style="border-bottom: 2px solid black;border-top: 1px solid white;">
+                                <b>Created On</b>
+                            </td>
+                            <td width="25%" style="border-bottom: 2px solid black;border-top: 1px solid white;">
+                                <b>Correct</b>
+                            </td>
+                            <td width="25%" style="border-bottom: 2px solid black;border-top: 1px solid white;">
+                                <b>Score</b>
+                            </td>
+                           
+                        </tr>
+                        <tr t-foreach="survey_detail.user_input_line_ids" t-as="line">
+                            <td>
+                                <a role="button"  data-bs-toggle="modal" t-attf-data-bs-target="#modelanswer{{line.id}}" href="#" t-attf-aria-controls="modelanswer{{line.id}}">
+					<span t-field="line.question_id"/>
+				</a>	
+                            </td>
+                             <td>
+                               <span t-field="line.page_id"/>
+                            </td>
+                            <td>
+                                <span t-field="line.answer_type" />
+                            </td>
+                            <td class="custom-checkbox">
+                                 <input type="checkbox" t-att-disabled="'disabled'" t-att-checked="line.skipped"/>
+                            </td>
+                             <td>
+                                <span t-esc="line.create_date" />
+                            </td>
+                             <td class="custom-checkbox">
+                                <input type="checkbox" t-att-disabled="'disabled'" t-att-checked="line.answer_is_correct"/>
+                            </td>
+                             <td>
+                                <span t-esc="line.answer_score"/>
+                            </td>
+                        </tr>
+                    </table>
+        </div>
+        <div class="oe_structure mb32" />
+    </template> 
+    
+</odoo>
+
+
