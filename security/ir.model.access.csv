@@ -1,7 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_survey_user_input_portal,survey.user_input,model_survey_user_input,base.group_portal,1,0,0,0
-
-
-
-
-
+access_survey_survey_portal,survey.survey.portal,survey.model_survey_survey,base.group_portal,1,0,0,0
+access_survey_user_input_portal,survey.user_input.portal,survey.model_survey_user_input,base.group_portal,1,1,0,0
+access_survey_user_input_line_portal,survey.user_input.line.portal,survey.model_survey_user_input_line,base.group_portal,1,1,0,0
+access_survey_question_portal,survey.question.portal,survey.model_survey_question,base.group_portal,1,0,0,0
+access_survey_question_answer_portal,survey.question.answer.portal,survey.model_survey_question_answer,base.group_portal,1,0,0,0
